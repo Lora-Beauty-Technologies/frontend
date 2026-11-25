@@ -1,0 +1,86 @@
+/* In Tailwind's base layer: after preflight, but below utility classes. */
+@import "@telegram-apps/telegram-ui/dist/styles.css" layer(base);
+
+/*
+ * Forma demo theme. The demo always renders the light Figma design, so the
+ * TelegramUI variables are pinned here instead of following the Telegram
+ * client's theme. The doubled class wins over AppRoot's own defaults.
+ */
+.forma-theme.forma-theme {
+  --forma-ink: #17243b;
+  --forma-muted: #67758d;
+  --forma-accent: #2764e7;
+  --forma-accent-soft: #ebf1ff;
+  --forma-accent-border: #b8ceff;
+  --forma-success: #21816b;
+  --forma-surface: #f8f9fb;
+  --forma-card: #ffffff;
+  --forma-track: #e3e8f0;
+  --forma-sidebar-edge: #e8edf5;
+  --forma-player-bg: #101a31;
+  --forma-player-tint: #102a60;
+  --forma-player-controls: #17243b;
+  --forma-player-timeline: #bfcbdf;
+
+  --tgui--font-family: var(--font-forma), system-ui, sans-serif;
+  --tgui--bg_color: var(--forma-surface);
+  --tgui--secondary_bg_color: var(--forma-surface);
+  --tgui--text_color: var(--forma-ink);
+  --tgui--hint_color: var(--forma-muted);
+  --tgui--link_color: var(--forma-accent);
+  --tgui--accent_text_color: var(--forma-accent);
+  --tgui--button_color: var(--forma-accent);
+  --tgui--button_text_color: #ffffff;
+  --tgui--plain_foreground: var(--forma-ink);
+  --tgui--secondary_fill: var(--forma-track);
+
+  min-height: 100dvh;
+  background: var(--forma-surface);
+  color: var(--forma-ink);
+  font-family: var(--tgui--font-family);
+}
+
+/* TelegramUI size overrides to match the Figma measurements. */
+.forma-theme .forma-icon-button {
+  width: 44px;
+  height: 44px;
+  padding: 10px;
+  border-radius: 12px;
+}
+
+.forma-theme .forma-link-button {
+  height: 38px;
+  min-height: 38px;
+  border-radius: 11px;
+}
+
+.forma-theme .forma-link-button,
+.forma-theme .forma-link-button * {
+  font-size: 12px;
+  font-weight: 600;
+  line-height: normal;
+}
+
+.forma-theme .forma-progress {
+  height: 5px;
+  border-radius: 3px;
+  background: var(--forma-track);
+}
+
+.forma-theme .forma-progress > * {
+  background: var(--forma-accent);
+}
+
+/* The base platform draws a translucent track overlay; the design has a flat track. */
+.forma-theme .forma-progress::after {
+  content: none;
+}
+
+/*
+ * TelegramUI's Image reveals the <img> only from its onLoad handler, which
+ * never fires when the server-rendered image finished loading before
+ * hydration. The avatar source is a local static asset, so always show it.
+ */
+.forma-theme .forma-avatar img {
+  visibility: visible;
+}
