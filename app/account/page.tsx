@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Send } from "lucide-react";
 import { buttonVariants } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import { Card } from "@/components/ui/card";
 import { fetchMyCourses } from "@/lib/backend";
 import { serverAccessToken } from "@/lib/supabase/session";
@@ -22,7 +23,7 @@ export default async function AccountPage() {
         {courses.length === 0 ? (
           <Card className="mt-8 items-start p-6">
             <p className="text-muted-foreground">У вас пока нет курсов.</p>
-            <Link href="/" className={buttonVariants({ className: "h-11 px-5" })}>Перейти в каталог</Link>
+            <Link href="/" className={cn(buttonVariants({ className: "h-11 px-5" }))}>Перейти в каталог</Link>
           </Card>
         ) : (
           <ul className="mt-8 grid gap-4 md:grid-cols-2">
@@ -36,7 +37,7 @@ export default async function AccountPage() {
                       <div className="flex flex-col gap-4 sm:flex-row sm:items-end">
                         <UnlockProgress unlocked={course.unlockedLessons} total={course.totalLessons} />
                         <Link href={`/learn/${course.slug}`}
-                          className={buttonVariants({ variant: isStarted ? "default" : "outline", className: "h-11 w-full px-5 sm:h-10 sm:w-auto" })}>
+                          className={cn(buttonVariants({ variant: isStarted ? "default" : "outline", className: "h-11 w-full px-5 sm:h-10 sm:w-auto" }))}>
                           {isStarted ? "Продолжить курс" : "Начать курс"}
                         </Link>
                       </div>

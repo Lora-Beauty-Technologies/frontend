@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { buttonVariants } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/server";
 import { Brand } from "./brand";
 import { UserMenu } from "./user-menu";
@@ -15,7 +16,7 @@ export async function SiteHeader() {
         {email ? (
           <UserMenu email={email} />
         ) : (
-          <Link href="/login" className={buttonVariants({ variant: "outline", className: "h-10 px-4" })}>Войти</Link>
+          <Link href="/login" className={cn(buttonVariants({ variant: "outline", className: "h-10 px-4" }))}>Войти</Link>
         )}
       </div>
     </header>

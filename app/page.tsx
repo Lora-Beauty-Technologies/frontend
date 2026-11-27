@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { buttonVariants } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import { catalogClient } from "@/lib/supabase/catalog";
 import { CourseCard } from "./_components/course-card";
 import { SiteHeader } from "./_components/site-header";
@@ -24,7 +25,7 @@ export default async function HomePage() {
                 lessonCount={course.lessons.length}
                 totalSeconds={course.lessons.reduce((sum, l) => sum + l.duration_seconds, 0)}
                 footer={
-                  <Link href={`/courses/${course.slug}`} className={buttonVariants({ variant: "outline", className: "h-11 w-full px-5 sm:h-10 sm:w-auto" })}>
+                  <Link href={`/courses/${course.slug}`} className={cn(buttonVariants({ variant: "outline", className: "h-11 w-full px-5 sm:h-10 sm:w-auto" }))}>
                     Подробнее о курсе
                   </Link>
                 } />
