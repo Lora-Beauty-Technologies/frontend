@@ -1,17 +1,28 @@
 import type { LessonSummary, MyCourse } from "@/lib/backend";
 import { formatDuration, formatTotalDuration, formatUnlockDate, lessonsLabel, twoDigits } from "@/lib/format";
-import { ChevronIcon, LockIcon } from "./icons";
+import { ChevronIcon, LockIcon, MenuIcon } from "./icons";
 
-type Props = { course: MyCourse; courseNumber: number; onOpenLesson: (lesson: LessonSummary) => void };
+type Props = {
+  course: MyCourse;
+  courseNumber: number;
+  onOpenLesson: (lesson: LessonSummary) => void;
+  /** Opens the "My courses" drawer; omitted when there is only one course. */
+  onOpenCourses?: () => void;
+};
 
 /** "My classroom": course summary, unlock progress and lessons grouped by section. */
-export function CourseScreen({ course, courseNumber, onOpenLesson }: Props) {
+export function CourseScreen({ course, courseNumber, onOpenLesson, onOpenCourses }: Props) {
   const lessons = course.sections.flatMap((s) => s.lessons);
   const latest = lessons.find((l) => l.status === "latest");
   const isFirstDay = course.unlockedLessons <= 1;
 
   return (
     <main className="flex flex-col gap-4 px-5 pt-6 pb-10">
+      {onOpenCourses ? (
+        <button onClick={onOpenCourses} className="flex items-center gap-2 self-start text-[15px] font-medium text-(--app-accent)">
+          <MenuIcon /> Мои курсы
+        </button>
+      ) : null}
       <div>
         <p className="text-[13px] font-semibold uppercase text-(--app-accent)">
           Курс {twoDigits(courseNumber)} · {course.category}

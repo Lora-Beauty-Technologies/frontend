@@ -3,10 +3,8 @@
 import { useEffect, useState } from "react";
 import type { LessonSummary } from "@/lib/backend";
 import { useMiniAppSession } from "../_lib/use-mini-app-session";
-import { AppBar } from "./app-bar";
 import { CourseScreen } from "./course-screen";
 import { CoursesDrawer } from "./courses-drawer";
-import { BackIcon, MenuIcon } from "./icons";
 import { LessonScreen } from "./lesson-screen";
 import { StatusScreen } from "./status-screen";
 
@@ -52,19 +50,15 @@ export function MiniApp() {
 
   if (lesson) {
     return (
-      <>
-        <AppBar webApp={state.webApp} title="Сейчас изучаем"
-          leading={<button onClick={() => setLesson(null)} aria-label="Назад к урокам" className="flex"><BackIcon /></button>} />
-        <LessonScreen course={course} lesson={lesson} getAccessToken={getAccessToken} />
-      </>
+      // Back is Telegram's own header button (wired above).
+      <LessonScreen course={course} lesson={lesson} getAccessToken={getAccessToken} />
     );
   }
 
   return (
     <>
-      <AppBar webApp={state.webApp} title="Мой класс"
-        leading={<button onClick={() => setIsDrawerOpen(true)} aria-label="Открыть мои курсы" className="flex"><MenuIcon /></button>} />
-      <CourseScreen course={course} courseNumber={courseIndex + 1} onOpenLesson={setLesson} />
+      <CourseScreen course={course} courseNumber={courseIndex + 1} onOpenLesson={setLesson}
+        onOpenCourses={courses.length > 1 ? () => setIsDrawerOpen(true) : undefined} />
       {isDrawerOpen ? (
         <CoursesDrawer courses={courses} currentSlug={course.slug}
           onSelect={(slug) => { setCourseSlug(slug); setIsDrawerOpen(false); }}
