@@ -22,15 +22,15 @@ export default async function LearnPage({ params, searchParams }: PageProps<"/le
     <>
       <SiteHeader />
       <main className="mx-auto w-full max-w-4xl px-6 py-8">
-        <Link href="/account" className="text-sm text-blue-600">← My courses</Link>
+        <Link href="/account" className="text-sm text-blue-600">← Мои курсы</Link>
         <p className="mt-4 text-xs font-semibold uppercase text-blue-600">
-          {course.category} · Lesson {twoDigits(current.position)} of {twoDigits(course.totalLessons)}
+          {course.category} · Урок {twoDigits(current.position)} из {twoDigits(course.totalLessons)}
         </p>
         <h1 className="mt-1 text-2xl font-bold">{current.title}</h1>
         <div className="mt-4 overflow-hidden rounded-2xl">
           {current.status === "locked" ? (
             <div className="flex aspect-video items-center justify-center bg-gray-200 text-gray-600">
-              Unlocks on {formatUnlockDate(current.unlocksAt!)}
+              Откроется {formatUnlockDate(current.unlocksAt!)}
             </div>
           ) : (
             <WebLessonPlayer lessonId={current.id} title={current.title} />
@@ -50,7 +50,7 @@ export default async function LearnPage({ params, searchParams }: PageProps<"/le
                       <p className="font-medium">{lesson.title}</p>
                       <p className="text-sm text-gray-500">
                         {formatDuration(lesson.durationSeconds)} ·{" "}
-                        {lesson.status === "locked" ? `Unlocks ${formatUnlockDate(lesson.unlocksAt!)}` : lesson.status === "latest" ? "Up next" : "Video lesson"}
+                        {lesson.status === "locked" ? `Откроется ${formatUnlockDate(lesson.unlocksAt!)}` : lesson.status === "latest" ? "Следующий" : "Видеоурок"}
                       </p>
                     </div>
                   </div>

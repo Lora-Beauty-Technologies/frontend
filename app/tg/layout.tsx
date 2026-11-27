@@ -2,8 +2,8 @@ import type { Metadata, Viewport } from "next";
 import "./miniapp.css";
 
 export const metadata: Metadata = {
-  title: "My classroom",
-  description: "Access your purchased courses.",
+  title: "Мой класс",
+  description: "Доступ к вашим купленным курсам.",
 };
 
 export const viewport: Viewport = { width: "device-width", initialScale: 1, viewportFit: "cover" };

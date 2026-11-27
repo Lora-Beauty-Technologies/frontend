@@ -30,7 +30,7 @@ export function EnrollButton({ courseId, slug }: { courseId: string; slug: strin
     <div>
       <button onClick={enroll} disabled={isBusy}
         className="rounded-xl bg-blue-600 px-6 py-3 font-semibold text-white disabled:opacity-60">
-        {isBusy ? "Enrolling…" : "Enroll for free (demo)"}
+        {isBusy ? "Записываем…" : "Записаться бесплатно (демо)"}
       </button>
       {error ? <p role="alert" className="mt-2 text-sm text-red-600">{error}</p> : null}
     </div>

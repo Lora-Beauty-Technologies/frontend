@@ -16,8 +16,8 @@ export default async function LoginPage({ searchParams }: PageProps<"/login">) {
   return (
     <main className="mx-auto flex min-h-dvh max-w-sm flex-col justify-center gap-6 px-6">
       <div>
-        <h1 className="text-2xl font-bold">Sign in or sign up</h1>
-        <p className="mt-1 text-sm text-gray-600">No password needed: we email you a one-time code.</p>
+        <h1 className="text-2xl font-bold">Вход и регистрация</h1>
+        <p className="mt-1 text-sm text-gray-600">Пароль не нужен: мы отправим одноразовый код на вашу почту.</p>
       </div>
       <LoginForm next={next} />
     </main>

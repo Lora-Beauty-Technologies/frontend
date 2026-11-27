@@ -33,19 +33,19 @@ export function MiniApp() {
 
   switch (state.kind) {
     case "loading":
-      return <StatusScreen title="Loading your courses…" />;
+      return <StatusScreen title="Загружаем ваши курсы…" />;
     case "outside-telegram":
-      return <StatusScreen title="Open in Telegram" message="This page works inside the Telegram app." />;
+      return <StatusScreen title="Откройте в Telegram" message="Эта страница работает внутри приложения Telegram." />;
     case "not-linked":
-      return <StatusScreen title="Your account isn't linked yet"
-        message="Open your account on the website and tap Watch in Telegram." />;
+      return <StatusScreen title="Аккаунт ещё не привязан"
+        message="Откройте свой аккаунт на сайте и нажмите «Смотреть в Telegram»." />;
     case "error":
-      return <StatusScreen title="Something went wrong" message={state.message} />;
+      return <StatusScreen title="Что-то пошло не так" message={state.message} />;
   }
 
   const { courses } = state;
   if (courses.length === 0) {
-    return <StatusScreen title="No courses yet" message="Courses you enroll in on the website appear here." />;
+    return <StatusScreen title="Курсов пока нет" message="Здесь появятся курсы, на которые вы запишетесь на сайте." />;
   }
   const courseIndex = Math.max(0, courses.findIndex((c) => c.slug === courseSlug));
   const course = courses[courseIndex];
@@ -53,8 +53,8 @@ export function MiniApp() {
   if (lesson) {
     return (
       <>
-        <AppBar webApp={state.webApp} title="Now learning"
-          leading={<button onClick={() => setLesson(null)} aria-label="Back to lessons" className="flex"><BackIcon /></button>} />
+        <AppBar webApp={state.webApp} title="Сейчас изучаем"
+          leading={<button onClick={() => setLesson(null)} aria-label="Назад к урокам" className="flex"><BackIcon /></button>} />
         <LessonScreen course={course} lesson={lesson} getAccessToken={getAccessToken} />
       </>
     );
@@ -62,8 +62,8 @@ export function MiniApp() {
 
   return (
     <>
-      <AppBar webApp={state.webApp} title="My classroom"
-        leading={<button onClick={() => setIsDrawerOpen(true)} aria-label="Open my courses" className="flex"><MenuIcon /></button>} />
+      <AppBar webApp={state.webApp} title="Мой класс"
+        leading={<button onClick={() => setIsDrawerOpen(true)} aria-label="Открыть мои курсы" className="flex"><MenuIcon /></button>} />
       <CourseScreen course={course} courseNumber={courseIndex + 1} onOpenLesson={setLesson} />
       {isDrawerOpen ? (
         <CoursesDrawer courses={courses} currentSlug={course.slug}

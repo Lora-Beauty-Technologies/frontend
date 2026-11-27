@@ -59,10 +59,25 @@ export async function backendFetch<T>(
   });
   if (!response.ok) {
     const problem = await response.json().catch(() => ({}));
-    throw new ApiError(response.status, problem.type ?? "error", problem.detail ?? "Something went wrong.");
+    const code = problem.type ?? "error";
+    throw new ApiError(response.status, code, errorMessages[code] ?? "Что-то пошло не так. Попробуйте ещё раз.");
   }
   return response.json();
 }
+
+/** Russian texts for the backend's problem codes. */
+const errorMessages: Record<string, string> = {
+  course_not_found: "Курс не найден.",
+  lesson_not_found: "Урок не найден.",
+  not_enrolled: "Вы не записаны на этот курс.",
+  lesson_locked: "Этот урок ещё не открыт.",
+  video_not_ready: "Видео для этого урока ещё не загружено.",
+  invalid_init_data: "Не удалось проверить данные Telegram. Откройте приложение заново.",
+  not_linked: "Этот аккаунт Telegram ещё не привязан.",
+  telegram_already_linked: "Этот аккаунт Telegram уже привязан к другому пользователю.",
+  link_token_invalid: "Ссылка устарела или уже использована. Нажмите «Смотреть в Telegram» на сайте ещё раз.",
+  no_email: "Аккаунты без email пока не поддерживаются.",
+};
 
 export const fetchMyCourses = (accessToken: string) =>
   backendFetch<{ courses: MyCourse[] }>("/api/me/courses", { accessToken }).then((r) => r.courses);

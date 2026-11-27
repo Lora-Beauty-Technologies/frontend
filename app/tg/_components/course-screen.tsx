@@ -1,5 +1,5 @@
 import type { LessonSummary, MyCourse } from "@/lib/backend";
-import { formatDuration, formatTotalDuration, formatUnlockDate, twoDigits } from "@/lib/format";
+import { formatDuration, formatTotalDuration, formatUnlockDate, lessonsLabel, twoDigits } from "@/lib/format";
 import { ChevronIcon, LockIcon } from "./icons";
 
 type Props = { course: MyCourse; courseNumber: number; onOpenLesson: (lesson: LessonSummary) => void };
@@ -14,19 +14,19 @@ export function CourseScreen({ course, courseNumber, onOpenLesson }: Props) {
     <main className="flex flex-col gap-4 px-5 pt-6 pb-10">
       <div>
         <p className="text-[13px] font-semibold uppercase text-(--app-accent)">
-          Course {twoDigits(courseNumber)} · {course.category}
+          Курс {twoDigits(courseNumber)} · {course.category}
         </p>
         <h2 className="mt-1.5 text-[28px] font-bold leading-tight">{course.title}</h2>
         <p className="mt-1.5 text-[15px] text-(--app-hint)">{course.tagline}</p>
         <p className="mt-1.5 text-[13px] text-(--app-hint)">
-          {course.totalLessons} lessons · {formatTotalDuration(course.totalDurationSeconds)} · {course.level}
+          {lessonsLabel(course.totalLessons)} · {formatTotalDuration(course.totalDurationSeconds)} · {course.level}
         </p>
       </div>
 
       <section className="rounded-2xl bg-(--app-card) p-4">
-        <h3 className="text-[17px] font-semibold">{isFirstDay ? "Start something great" : "Keep your momentum"}</h3>
+        <h3 className="text-[17px] font-semibold">{isFirstDay ? "Начните что-то великое" : "Не сбавляйте темп"}</h3>
         <p className="mt-0.5 text-[15px] text-(--app-hint)">
-          {course.unlockedLessons} of {course.totalLessons} lessons unlocked
+          Открыто {course.unlockedLessons} из {lessonsLabel(course.totalLessons)}
         </p>
         <div className="mt-2.5 h-1 rounded-full bg-(--app-track)">
           <div className="h-1 rounded-full bg-(--app-button)" style={{ width: `${(course.unlockedLessons / course.totalLessons) * 100}%` }} />
@@ -34,7 +34,7 @@ export function CourseScreen({ course, courseNumber, onOpenLesson }: Props) {
         {latest ? (
           <button onClick={() => onOpenLesson(latest)}
             className="mt-4 h-[50px] w-full rounded-xl bg-(--app-button) text-[17px] font-semibold text-(--app-button-text)">
-            {isFirstDay ? "Start" : "Watch"} lesson {latest.position}
+            {isFirstDay ? "Начать" : "Смотреть"} урок {latest.position}
           </button>
         ) : null}
       </section>
@@ -56,7 +56,7 @@ export function CourseScreen({ course, courseNumber, onOpenLesson }: Props) {
 function LessonCell({ lesson, onOpen }: { lesson: LessonSummary; onOpen: () => void }) {
   const isLocked = lesson.status === "locked";
   const isLatest = lesson.status === "latest";
-  const subtitle = isLocked ? `Unlocks ${formatUnlockDate(lesson.unlocksAt!)}` : isLatest ? "Up next" : "Video lesson";
+  const subtitle = isLocked ? `Откроется ${formatUnlockDate(lesson.unlocksAt!)}` : isLatest ? "Следующий" : "Видеоурок";
   return (
     <button onClick={onOpen} disabled={isLocked}
       className={`flex w-full items-center gap-4 pl-4 text-left ${isLatest ? "bg-(--app-highlight)" : ""} ${isLocked ? "opacity-50" : ""}`}>

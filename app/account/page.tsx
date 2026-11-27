@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { fetchMyCourses } from "@/lib/backend";
+import { lessonsLabel } from "@/lib/format";
 import { createClient } from "@/lib/supabase/server";
 import { serverAccessToken } from "@/lib/supabase/session";
 import { signOut } from "../auth-actions";
@@ -18,17 +19,17 @@ export default async function AccountPage() {
       <main className="mx-auto flex w-full max-w-4xl flex-col gap-8 px-6 py-12">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold">My courses</h1>
-            <p className="text-sm text-gray-500">Signed in as {email}</p>
+            <h1 className="text-2xl font-bold">Мои курсы</h1>
+            <p className="text-sm text-gray-500">Вы вошли как {email}</p>
           </div>
           <form action={signOut}>
-            <button type="submit" className="text-sm text-blue-600">Sign out</button>
+            <button type="submit" className="text-sm text-blue-600">Выйти</button>
           </form>
         </div>
 
         {courses.length === 0 ? (
           <p className="text-gray-600">
-            No courses yet. <Link href="/" className="text-blue-600">Browse the catalog</Link>.
+            Курсов пока нет. <Link href="/" className="text-blue-600">Перейти в каталог</Link>.
           </p>
         ) : (
           <ul className="grid gap-4 sm:grid-cols-2">
@@ -38,9 +39,9 @@ export default async function AccountPage() {
                   <p className="text-xs font-semibold uppercase text-blue-600">{course.category}</p>
                   <h2 className="mt-1 text-xl font-semibold">{course.title}</h2>
                   <p className="mt-2 text-sm text-gray-500">
-                    {course.unlockedLessons} of {course.totalLessons} lessons unlocked
+                    Открыто {course.unlockedLessons} из {lessonsLabel(course.totalLessons)}
                   </p>
-                  <p className="mt-3 text-sm font-semibold text-blue-600">Continue learning →</p>
+                  <p className="mt-3 text-sm font-semibold text-blue-600">Продолжить обучение →</p>
                 </Link>
               </li>
             ))}
@@ -49,9 +50,9 @@ export default async function AccountPage() {
 
         {courses.length > 0 ? (
           <section className="rounded-2xl border bg-white p-6">
-            <h2 className="font-semibold">Watch on your phone</h2>
+            <h2 className="font-semibold">Смотрите на телефоне</h2>
             <p className="mt-1 mb-4 text-sm text-gray-600">
-              Open your courses in our Telegram app. The first tap links your Telegram account.
+              Откройте свои курсы в нашем приложении в Telegram. При первом нажатии ваш аккаунт Telegram будет привязан.
             </p>
             <WatchInTelegramButton />
           </section>

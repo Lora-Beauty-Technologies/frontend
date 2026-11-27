@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import { catalogClient } from "@/lib/supabase/catalog";
-import { formatDuration, formatTotalDuration, twoDigits } from "@/lib/format";
+import { formatDuration, formatTotalDuration, lessonsLabel, twoDigits } from "@/lib/format";
 import { SiteHeader } from "../../_components/site-header";
 import { EnrollButton } from "./enroll-button";
 
@@ -24,7 +24,7 @@ export default async function CoursePage({ params }: PageProps<"/courses/[slug]"
         <h1 className="mt-1 text-3xl font-bold">{course.title}</h1>
         <p className="mt-2 text-gray-600">{course.tagline}</p>
         <p className="mt-2 text-sm text-gray-500">
-          {lessons.length} lessons · {formatTotalDuration(lessons.reduce((sum, l) => sum + l.duration_seconds, 0))} · {course.level} · one lesson unlocks every day
+          {lessonsLabel(lessons.length)} · {formatTotalDuration(lessons.reduce((sum, l) => sum + l.duration_seconds, 0))} · {course.level} · каждый день открывается новый урок
         </p>
         <div className="mt-8"><EnrollButton courseId={course.id} slug={course.slug} /></div>
         {sections.map((section) => (

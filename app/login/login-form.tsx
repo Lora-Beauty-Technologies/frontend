@@ -19,7 +19,7 @@ export function LoginForm({ next }: { next: string }) {
     setError(null);
     const { error } = await action();
     setIsBusy(false);
-    if (error) setError(error.message);
+    if (error) setError(authErrorMessage(error.message));
     else onSuccess();
   }
 
@@ -46,33 +46,40 @@ export function LoginForm({ next }: { next: string }) {
 
   return step === "email" ? (
     <form onSubmit={sendCode} className="flex flex-col gap-3">
-      <label className="text-sm font-medium" htmlFor="email">Email</label>
+      <label className="text-sm font-medium" htmlFor="email">Электронная почта</label>
       <input id="email" type="email" required autoComplete="email" value={email}
         onChange={(e) => setEmail(e.target.value)} className="rounded-lg border px-3 py-2" />
-      <SubmitButton isBusy={isBusy}>Send code</SubmitButton>
+      <SubmitButton isBusy={isBusy}>Получить код</SubmitButton>
       <ErrorText error={error} />
     </form>
   ) : (
     <form onSubmit={verifyCode} className="flex flex-col gap-3">
-      <p className="text-sm text-gray-600">We sent a sign-in code to {email}.</p>
-      <label className="text-sm font-medium" htmlFor="code">Code</label>
+      <p className="text-sm text-gray-600">Мы отправили код для входа на {email}.</p>
+      <label className="text-sm font-medium" htmlFor="code">Код</label>
       <input id="code" inputMode="numeric" autoComplete="one-time-code" required pattern="[0-9]{6,10}"
         maxLength={10} value={code} onChange={(e) => setCode(e.target.value.replace(/\D/g, ""))}
         className="rounded-lg border px-3 py-2 tracking-widest" />
-      <SubmitButton isBusy={isBusy}>Sign in</SubmitButton>
+      <SubmitButton isBusy={isBusy}>Войти</SubmitButton>
       <button type="button" className="text-sm text-blue-600" onClick={() => { setStep("email"); setCode(""); }}>
-        Use a different email
+        Указать другую почту
       </button>
       <ErrorText error={error} />
     </form>
   );
 }
 
+/** Russian texts for the Supabase Auth errors users actually hit. */
+function authErrorMessage(message: string) {
+  if (/expired|invalid/i.test(message)) return "Код неверный или устарел. Запросите новый.";
+  if (/rate limit|security purposes/i.test(message)) return "Слишком много попыток. Подождите минуту и попробуйте снова.";
+  return "Не удалось войти. Попробуйте ещё раз.";
+}
+
 function SubmitButton({ isBusy, children }: { isBusy: boolean; children: React.ReactNode }) {
   return (
     <button type="submit" disabled={isBusy}
       className="rounded-lg bg-blue-600 px-4 py-2 font-semibold text-white disabled:opacity-60">
-      {isBusy ? "Please wait…" : children}
+      {isBusy ? "Подождите…" : children}
     </button>
   );
 }

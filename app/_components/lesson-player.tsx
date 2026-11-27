@@ -45,7 +45,7 @@ export function LessonPlayer({ lessonId, title, getAccessToken }: Props) {
           accentColor="#007AFF"
         />
       ) : (
-        <p className="px-6 text-center text-sm">{error ?? "Loading video…"}</p>
+        <p className="px-6 text-center text-sm">{error ?? "Загружаем видео…"}</p>
       )}
     </div>
   );

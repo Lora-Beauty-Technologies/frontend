@@ -25,8 +25,8 @@ export function loadTelegramWebApp(): Promise<TelegramWebApp> {
   return new Promise((resolve, reject) => {
     const script = document.createElement("script");
     script.src = SCRIPT_URL;
-    script.onload = () => (window.Telegram ? resolve(window.Telegram.WebApp) : reject(new Error("Telegram script failed")));
-    script.onerror = () => reject(new Error("Telegram script failed to load"));
+    script.onload = () => (window.Telegram ? resolve(window.Telegram.WebApp) : reject(new Error("Не удалось загрузить Telegram.")));
+    script.onerror = () => reject(new Error("Не удалось загрузить Telegram. Проверьте соединение."));
     document.head.appendChild(script);
   });
 }

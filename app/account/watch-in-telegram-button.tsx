@@ -27,7 +27,7 @@ export function WatchInTelegramButton() {
     <div>
       <button onClick={open} disabled={isBusy}
         className="rounded-xl bg-[#2AABEE] px-5 py-3 font-semibold text-white disabled:opacity-60">
-        {isBusy ? "Opening Telegram…" : "Watch in Telegram"}
+        {isBusy ? "Открываем Telegram…" : "Смотреть в Telegram"}
       </button>
       {error ? <p role="alert" className="mt-2 text-sm text-red-600">{error}</p> : null}
     </div>
