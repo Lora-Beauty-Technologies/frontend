@@ -1,10 +1,11 @@
 "use client";
 
 import { useState } from "react";
+import { Button } from "@/components/ui/button";
 import { backendFetch, type TelegramLink } from "@/lib/backend";
 import { browserAccessToken } from "@/lib/supabase/browser-token";
 
-/** Creates a one-time link token and opens the Mini App, which links this account. */
+/** Creates a one-time link token and opens the bot chat, where START links this account. */
 export function WatchInTelegramButton() {
   const [error, setError] = useState<string | null>(null);
   const [isBusy, setIsBusy] = useState(false);
@@ -18,18 +19,16 @@ export function WatchInTelegramButton() {
       window.location.href = link.deepLink;
     } catch (e) {
       setError((e as Error).message);
-    } finally {
       setIsBusy(false);
     }
   }
 
   return (
-    <div>
-      <button onClick={open} disabled={isBusy}
-        className="rounded-xl bg-[#2AABEE] px-5 py-3 font-semibold text-white disabled:opacity-60">
+    <div className="w-full sm:w-auto">
+      <Button onClick={open} disabled={isBusy} className="h-11 w-full bg-[#2AABEE] px-5 text-white hover:bg-[#229ED9] sm:h-10 sm:w-auto">
         {isBusy ? "Открываем Telegram…" : "Смотреть в Telegram"}
-      </button>
-      {error ? <p role="alert" className="mt-2 text-sm text-red-600">{error}</p> : null}
+      </Button>
+      {error ? <p role="alert" className="mt-2 text-sm text-destructive">{error}</p> : null}
     </div>
   );
 }

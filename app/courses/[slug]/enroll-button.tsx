@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
 import { backendFetch } from "@/lib/backend";
 import { browserAccessToken } from "@/lib/supabase/browser-token";
 
@@ -28,11 +29,10 @@ export function EnrollButton({ courseId, slug }: { courseId: string; slug: strin
 
   return (
     <div>
-      <button onClick={enroll} disabled={isBusy}
-        className="rounded-xl bg-blue-600 px-6 py-3 font-semibold text-white disabled:opacity-60">
-        {isBusy ? "Записываем…" : "Записаться бесплатно (демо)"}
-      </button>
-      {error ? <p role="alert" className="mt-2 text-sm text-red-600">{error}</p> : null}
+      <Button onClick={enroll} disabled={isBusy} className="h-11 w-full">
+        {isBusy ? "Записываем…" : "Записаться бесплатно"}
+      </Button>
+      {error ? <p role="alert" className="mt-2 text-sm text-destructive">{error}</p> : null}
     </div>
   );
 }

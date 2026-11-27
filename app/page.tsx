@@ -1,6 +1,7 @@
 import Link from "next/link";
+import { buttonVariants } from "@/components/ui/button";
 import { catalogClient } from "@/lib/supabase/catalog";
-import { formatTotalDuration, lessonsLabel } from "@/lib/format";
+import { CourseCard } from "./_components/course-card";
 import { SiteHeader } from "./_components/site-header";
 
 export default async function HomePage() {
@@ -12,21 +13,21 @@ export default async function HomePage() {
   return (
     <>
       <SiteHeader />
-      <main className="mx-auto w-full max-w-4xl px-6 py-12">
-        <p className="text-sm font-semibold uppercase tracking-wide text-blue-600">Учитесь в своём темпе</p>
-        <h1 className="mt-2 text-3xl font-bold">Один новый урок каждый день.</h1>
-        <p className="mt-2 text-gray-600">Записывайтесь на сайте, смотрите здесь или в Telegram.</p>
-        <ul className="mt-10 grid gap-4 sm:grid-cols-2">
+      <main className="mx-auto w-full max-w-6xl px-4 py-10 sm:px-6 sm:py-16">
+        <p className="text-sm font-medium uppercase tracking-wide text-muted-foreground">Учитесь в своём темпе</p>
+        <h1 className="mt-3 max-w-2xl text-3xl font-semibold tracking-tight sm:text-4xl">Один новый урок каждый день.</h1>
+        <p className="mt-3 max-w-xl text-muted-foreground">Записывайтесь на сайте, смотрите здесь или в Telegram.</p>
+        <ul className="mt-10 grid gap-4 md:grid-cols-2">
           {(courses ?? []).map((course) => (
             <li key={course.id}>
-              <Link href={`/courses/${course.slug}`} className="block rounded-2xl border bg-white p-6 hover:border-blue-400">
-                <p className="text-xs font-semibold uppercase text-blue-600">{course.category}</p>
-                <h2 className="mt-1 text-xl font-semibold">{course.title}</h2>
-                <p className="mt-1 text-sm text-gray-600">{course.tagline}</p>
-                <p className="mt-4 text-xs text-gray-500">
-                  {lessonsLabel(course.lessons.length)} · {formatTotalDuration(course.lessons.reduce((sum, l) => sum + l.duration_seconds, 0))} · {course.level}
-                </p>
-              </Link>
+              <CourseCard title={course.title} tagline={course.tagline} level={course.level}
+                lessonCount={course.lessons.length}
+                totalSeconds={course.lessons.reduce((sum, l) => sum + l.duration_seconds, 0)}
+                footer={
+                  <Link href={`/courses/${course.slug}`} className={buttonVariants({ variant: "outline", className: "h-11 w-full px-5 sm:h-10 sm:w-auto" })}>
+                    Подробнее о курсе
+                  </Link>
+                } />
             </li>
           ))}
         </ul>

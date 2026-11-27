@@ -1,9 +1,12 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { ArrowLeft, Lock } from "lucide-react";
 import { fetchMyCourses } from "@/lib/backend";
-import { formatDuration, formatUnlockDate, twoDigits } from "@/lib/format";
+import { formatTotalDuration, formatUnlockDate, lessonsLabel, twoDigits } from "@/lib/format";
 import { serverAccessToken } from "@/lib/supabase/session";
+import { LessonRow } from "../../_components/lesson-row";
 import { SiteHeader } from "../../_components/site-header";
+import { UnlockProgress } from "../../_components/unlock-progress";
 import { WebLessonPlayer } from "./web-lesson-player";
 
 export default async function LearnPage({ params, searchParams }: PageProps<"/learn/[slug]">) {
@@ -14,56 +17,66 @@ export default async function LearnPage({ params, searchParams }: PageProps<"/le
   if (!course) notFound();
 
   const lessons = course.sections.flatMap((s) => s.lessons);
-  const current = lessons.find((l) => l.position === Number(lessonParam))
+  const current = lessons.find((l) => l.position === Number(lessonParam) && l.status !== "locked")
     ?? lessons.find((l) => l.status === "latest")
     ?? lessons[0];
+  const lessonLabel = `Урок ${twoDigits(current.position)} / ${twoDigits(course.totalLessons)}`;
 
   return (
     <>
       <SiteHeader />
-      <main className="mx-auto w-full max-w-4xl px-6 py-8">
-        <Link href="/account" className="text-sm text-blue-600">← Мои курсы</Link>
-        <p className="mt-4 text-xs font-semibold uppercase text-blue-600">
-          {course.category} · Урок {twoDigits(current.position)} из {twoDigits(course.totalLessons)}
-        </p>
-        <h1 className="mt-1 text-2xl font-bold">{current.title}</h1>
-        <div className="mt-4 overflow-hidden rounded-2xl">
-          {current.status === "locked" ? (
-            <div className="flex aspect-video items-center justify-center bg-gray-200 text-gray-600">
-              Откроется {formatUnlockDate(current.unlocksAt!)}
-            </div>
-          ) : (
-            <WebLessonPlayer lessonId={current.id} title={current.title} />
-          )}
-        </div>
-        <p className="mt-3 text-gray-600">{current.description}</p>
+      <main className="mx-auto w-full max-w-6xl px-4 pt-4 pb-12 sm:px-6 sm:pt-6">
+        <nav aria-label="Навигация" className="flex min-w-0 items-center gap-4 text-sm">
+          <Link href="/account" className="-ml-2 flex h-10 shrink-0 items-center gap-2 rounded-md px-2 font-medium hover:bg-muted">
+            <ArrowLeft className="size-4" aria-hidden /> Все курсы
+          </Link>
+          <span className="truncate text-muted-foreground">{course.title}</span>
+        </nav>
 
-        {course.sections.map((section) => (
-          <section key={section.position} className="mt-8">
-            <h2 className="font-semibold">{twoDigits(section.position)} · {section.title}</h2>
-            <ol className="mt-3 divide-y rounded-2xl border bg-white">
-              {section.lessons.map((lesson) => {
-                const row = (
-                  <div className="flex gap-4 px-5 py-4">
-                    <span className="w-6 text-sm font-semibold text-gray-400">{twoDigits(lesson.position)}</span>
-                    <div>
-                      <p className="font-medium">{lesson.title}</p>
-                      <p className="text-sm text-gray-500">
-                        {formatDuration(lesson.durationSeconds)} ·{" "}
-                        {lesson.status === "locked" ? `Откроется ${formatUnlockDate(lesson.unlocksAt!)}` : lesson.status === "latest" ? "Следующий" : "Видеоурок"}
-                      </p>
-                    </div>
-                  </div>
-                );
-                return (
-                  <li key={lesson.id} className={lesson.id === current.id ? "bg-blue-50" : lesson.status === "locked" ? "opacity-50" : ""}>
-                    {lesson.status === "locked" ? row : <Link href={`/learn/${course.slug}?lesson=${lesson.position}`}>{row}</Link>}
-                  </li>
-                );
-              })}
-            </ol>
+        <div className="mt-4 grid gap-8 lg:grid-cols-[minmax(0,1fr)_340px]">
+          <section>
+            <div className="relative overflow-hidden rounded-xl bg-neutral-900">
+              {current.status === "locked" ? (
+                <div className="flex aspect-video flex-col items-center justify-center gap-2 text-neutral-300">
+                  <Lock className="size-6" aria-hidden />
+                  Откроется {formatUnlockDate(current.unlocksAt!)}
+                </div>
+              ) : (
+                <WebLessonPlayer lessonId={current.id} title={current.title} />
+              )}
+              {/* Title over the video on larger screens; pointer-events-none keeps the controls usable. */}
+              <div className="pointer-events-none absolute inset-x-0 top-0 hidden bg-gradient-to-b from-black/60 to-transparent p-8 pb-16 text-white sm:block">
+                <p className="text-sm font-medium uppercase">{lessonLabel}</p>
+                <h1 className="mt-3 text-2xl font-semibold tracking-tight">{current.title}</h1>
+              </div>
+            </div>
+            <div className="mt-4 sm:hidden">
+              <p className="text-xs font-medium uppercase text-muted-foreground">{lessonLabel}</p>
+              <h1 className="mt-1 text-xl font-semibold tracking-tight">{current.title}</h1>
+            </div>
+            <p className="mt-3 text-muted-foreground sm:mt-5">{current.description}</p>
           </section>
-        ))}
+
+          <aside aria-labelledby="lessons-heading">
+            <h2 id="lessons-heading" className="font-semibold">Уроки курса</h2>
+            <p className="mt-1 text-sm text-muted-foreground">{lessonsLabel(course.totalLessons)} · {formatTotalDuration(course.totalDurationSeconds)}</p>
+            <div className="mt-3"><UnlockProgress unlocked={course.unlockedLessons} total={course.totalLessons} /></div>
+            {course.sections.map((section) => (
+              <section key={section.position} className="mt-5">
+                <h3 className="px-3 text-xs font-medium uppercase text-muted-foreground">{twoDigits(section.position)} · {section.title}</h3>
+                <ol className="mt-1">
+                  {section.lessons.map((lesson) => (
+                    <li key={lesson.id}>
+                      <LessonRow position={lesson.position} title={lesson.title} durationSeconds={lesson.durationSeconds}
+                        status={lesson.status} unlocksAt={lesson.unlocksAt} isCurrent={lesson.id === current.id}
+                        href={`/learn/${course.slug}?lesson=${lesson.position}`} />
+                    </li>
+                  ))}
+                </ol>
+              </section>
+            ))}
+          </aside>
+        </div>
       </main>
     </>
   );

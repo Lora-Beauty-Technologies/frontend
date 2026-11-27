@@ -37,7 +37,7 @@ export function LessonPlayer({ lessonId, title, getAccessToken, fill = false }: 
   }, [lessonId, getAccessToken]);
 
   return (
-    <div className={`flex w-full items-center justify-center bg-[#4a5160] text-white ${fill ? "absolute inset-0" : "aspect-video"}`}>
+    <div className={`flex w-full items-center justify-center bg-neutral-900 text-white ${fill ? "absolute inset-0" : "aspect-video"}`}>
       {playback ? (
         <MuxPlayer
           className="h-full w-full"
@@ -45,7 +45,7 @@ export function LessonPlayer({ lessonId, title, getAccessToken, fill = false }: 
           playbackId={playback.playbackId}
           tokens={{ playback: playback.token }}
           metadata={{ video_title: title }}
-          accentColor="#007AFF"
+          accentColor={fill ? "#007AFF" : "#ffffff"}
         />
       ) : (
         <p className="px-6 text-center text-sm">{error ?? "Загружаем видео…"}</p>

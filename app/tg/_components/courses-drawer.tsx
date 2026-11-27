@@ -3,6 +3,7 @@ import { twoDigits } from "@/lib/format";
 import { ChevronIcon, CloseIcon } from "./icons";
 
 type Props = {
+  isOpen: boolean;
   courses: MyCourse[];
   currentSlug: string;
   onSelect: (slug: string) => void;
@@ -11,10 +12,12 @@ type Props = {
 };
 
 /** "My courses" side drawer. */
-export function CoursesDrawer({ courses, currentSlug, onSelect, onClose, onSupport }: Props) {
+/** Always mounted so it can slide in and out; hidden from input and screen readers while closed. */
+export function CoursesDrawer({ isOpen, courses, currentSlug, onSelect, onClose, onSupport }: Props) {
   return (
-    <div className="fixed inset-0 z-20 flex" role="dialog" aria-modal="true" aria-label="Мои курсы">
-      <nav className="flex w-[82%] max-w-[400px] flex-col bg-(--app-card) px-5 pb-8">
+    <div className={`fixed inset-0 z-20 flex ${isOpen ? "" : "pointer-events-none"}`} role="dialog" aria-modal="true"
+      aria-label="Мои курсы" aria-hidden={!isOpen} inert={!isOpen}>
+      <nav className={`relative z-10 flex w-[82%] max-w-[400px] flex-col bg-(--app-card) px-5 pb-8 shadow-xl transition-transform duration-300 ease-out motion-reduce:transition-none ${isOpen ? "translate-x-0" : "-translate-x-full"}`}>
         <div className="flex h-[60px] items-center gap-3">
           <button onClick={onClose} aria-label="Закрыть" className="flex size-7 items-center justify-center rounded-full bg-(--app-bg) text-(--app-hint)"><CloseIcon /></button>
           <h2 className="text-[17px] font-semibold">Мои курсы</h2>
@@ -44,7 +47,8 @@ export function CoursesDrawer({ courses, currentSlug, onSelect, onClose, onSuppo
         ) : null}
         <p className="mt-auto text-[13px] font-semibold uppercase text-(--app-hint)">Forma Academy</p>
       </nav>
-      <button className="flex-1 bg-black/30" aria-label="Закрыть меню" onClick={onClose} />
+      <button className={`absolute inset-0 bg-black/30 transition-opacity duration-300 motion-reduce:transition-none ${isOpen ? "opacity-100" : "opacity-0"}`}
+        aria-label="Закрыть меню" tabIndex={-1} onClick={onClose} />
     </div>
   );
 }

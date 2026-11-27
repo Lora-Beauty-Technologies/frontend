@@ -1,61 +1,65 @@
 import Link from "next/link";
+import { Send } from "lucide-react";
+import { buttonVariants } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 import { fetchMyCourses } from "@/lib/backend";
-import { lessonsLabel } from "@/lib/format";
-import { createClient } from "@/lib/supabase/server";
 import { serverAccessToken } from "@/lib/supabase/session";
-import { signOut } from "../auth-actions";
+import { CourseCard } from "../_components/course-card";
 import { SiteHeader } from "../_components/site-header";
+import { UnlockProgress } from "../_components/unlock-progress";
 import { WatchInTelegramButton } from "./watch-in-telegram-button";
 
 export default async function AccountPage() {
-  const supabase = await createClient();
-  const { data } = await supabase.auth.getClaims();
-  const email = data?.claims?.email as string | undefined;
   const courses = await fetchMyCourses((await serverAccessToken())!);
 
   return (
     <>
       <SiteHeader />
-      <main className="mx-auto flex w-full max-w-4xl flex-col gap-8 px-6 py-12">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-bold">Мои курсы</h1>
-            <p className="text-sm text-gray-500">Вы вошли как {email}</p>
-          </div>
-          <form action={signOut}>
-            <button type="submit" className="text-sm text-blue-600">Выйти</button>
-          </form>
-        </div>
+      <main className="mx-auto w-full max-w-6xl px-4 py-10 sm:px-6 sm:py-16">
+        <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">Мои курсы</h1>
+        <p className="mt-2 text-muted-foreground">Выберите курс и продолжите с того места, где остановились.</p>
 
         {courses.length === 0 ? (
-          <p className="text-gray-600">
-            Курсов пока нет. <Link href="/" className="text-blue-600">Перейти в каталог</Link>.
-          </p>
+          <Card className="mt-8 items-start p-6">
+            <p className="text-muted-foreground">У вас пока нет курсов.</p>
+            <Link href="/" className={buttonVariants({ className: "h-11 px-5" })}>Перейти в каталог</Link>
+          </Card>
         ) : (
-          <ul className="grid gap-4 sm:grid-cols-2">
-            {courses.map((course) => (
-              <li key={course.id}>
-                <Link href={`/learn/${course.slug}`} className="block rounded-2xl border bg-white p-6 hover:border-blue-400">
-                  <p className="text-xs font-semibold uppercase text-blue-600">{course.category}</p>
-                  <h2 className="mt-1 text-xl font-semibold">{course.title}</h2>
-                  <p className="mt-2 text-sm text-gray-500">
-                    Открыто {course.unlockedLessons} из {lessonsLabel(course.totalLessons)}
-                  </p>
-                  <p className="mt-3 text-sm font-semibold text-blue-600">Продолжить обучение →</p>
-                </Link>
-              </li>
-            ))}
+          <ul className="mt-8 grid gap-4 md:grid-cols-2">
+            {courses.map((course) => {
+              const isStarted = course.unlockedLessons > 1;
+              return (
+                <li key={course.id}>
+                  <CourseCard title={course.title} tagline={course.tagline} lessonCount={course.totalLessons}
+                    totalSeconds={course.totalDurationSeconds}
+                    footer={
+                      <div className="flex flex-col gap-4 sm:flex-row sm:items-end">
+                        <UnlockProgress unlocked={course.unlockedLessons} total={course.totalLessons} />
+                        <Link href={`/learn/${course.slug}`}
+                          className={buttonVariants({ variant: isStarted ? "default" : "outline", className: "h-11 w-full px-5 sm:h-10 sm:w-auto" })}>
+                          {isStarted ? "Продолжить курс" : "Начать курс"}
+                        </Link>
+                      </div>
+                    } />
+                </li>
+              );
+            })}
           </ul>
         )}
 
         {courses.length > 0 ? (
-          <section className="rounded-2xl border bg-white p-6">
-            <h2 className="font-semibold">Смотрите на телефоне</h2>
-            <p className="mt-1 mb-4 text-sm text-gray-600">
-              Откроется чат с нашим ботом: нажмите «Запустить», и ваш аккаунт будет привязан. В этом чате мы будем сообщать о новых уроках.
-            </p>
+          <Card className="mt-6 flex-col gap-4 p-5 sm:flex-row sm:items-center sm:p-6">
+            <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-[#2AABEE] text-white">
+              <Send className="size-5" aria-hidden />
+            </span>
+            <div className="flex-1">
+              <h2 className="font-semibold">Смотрите в Telegram</h2>
+              <p className="mt-1 text-sm text-muted-foreground">
+                Откроется чат с нашим ботом: нажмите «Запустить», и аккаунт будет привязан. Там же мы сообщим о новых уроках.
+              </p>
+            </div>
             <WatchInTelegramButton />
-          </section>
+          </Card>
         ) : null}
       </main>
     </>

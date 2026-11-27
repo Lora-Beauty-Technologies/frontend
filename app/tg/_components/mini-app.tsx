@@ -59,8 +59,8 @@ export function MiniApp() {
     <>
       <CourseScreen course={course} courseNumber={courseIndex + 1} onOpenLesson={setLesson}
         onOpenCourses={courses.length > 1 ? () => setIsDrawerOpen(true) : undefined} />
-      {isDrawerOpen ? (
-        <CoursesDrawer courses={courses} currentSlug={course.slug}
+      {courses.length > 1 ? (
+        <CoursesDrawer isOpen={isDrawerOpen} courses={courses} currentSlug={course.slug}
           onSelect={(slug) => { setCourseSlug(slug); setIsDrawerOpen(false); }}
           onClose={() => setIsDrawerOpen(false)}
           onSupport={supportBot ? () => state.webApp.openTelegramLink(`https://t.me/${supportBot}`) : undefined} />
