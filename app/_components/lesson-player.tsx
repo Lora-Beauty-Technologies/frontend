@@ -9,10 +9,12 @@ type Props = {
   title: string;
   /** Returns a current Supabase access token (web cookie session or Mini App session). */
   getAccessToken: () => Promise<string | null>;
+  /** Fill the parent (cropping the video) instead of a 16:9 box. */
+  fill?: boolean;
 };
 
 /** Fetches a signed playback token for the lesson and plays it with Mux Player. */
-export function LessonPlayer({ lessonId, title, getAccessToken }: Props) {
+export function LessonPlayer({ lessonId, title, getAccessToken, fill = false }: Props) {
   const [playback, setPlayback] = useState<PlaybackToken | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -35,10 +37,11 @@ export function LessonPlayer({ lessonId, title, getAccessToken }: Props) {
   }, [lessonId, getAccessToken]);
 
   return (
-    <div className="flex aspect-video w-full items-center justify-center bg-[#4a5160] text-white">
+    <div className={`flex w-full items-center justify-center bg-[#4a5160] text-white ${fill ? "absolute inset-0" : "aspect-video"}`}>
       {playback ? (
         <MuxPlayer
           className="h-full w-full"
+          style={fill ? { "--media-object-fit": "cover" } : undefined}
           playbackId={playback.playbackId}
           tokens={{ playback: playback.token }}
           metadata={{ video_title: title }}

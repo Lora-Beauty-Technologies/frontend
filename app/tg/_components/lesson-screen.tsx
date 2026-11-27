@@ -15,8 +15,8 @@ export function LessonScreen({ course, lesson, getAccessToken }: Props) {
         <h2 className="mt-3 text-[24px] font-bold">{lesson.title}</h2>
         <p className="mt-2 text-[15px] text-white/70">{lesson.description}</p>
       </div>
-      <div className="flex flex-1 items-center">
-        <LessonPlayer lessonId={lesson.id} title={lesson.title} getAccessToken={getAccessToken} />
+      <div className="relative flex-1">
+        <LessonPlayer lessonId={lesson.id} title={lesson.title} getAccessToken={getAccessToken} fill />
       </div>
     </main>
   );
