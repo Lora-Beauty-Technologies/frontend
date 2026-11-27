@@ -1,7 +1,6 @@
-import { redirect } from "next/navigation";
-import { courseHref, courses } from "./_data/courses";
+import { MiniApp } from "./_components/mini-app";
 
-/** The demo opens straight into the learner's current classroom. */
-export default function TelegramHomePage() {
-  redirect(courseHref(courses[0]));
+/** Telegram Mini App entry (consume-only: no catalog, no prices). */
+export default function MiniAppPage() {
+  return <MiniApp />;
 }

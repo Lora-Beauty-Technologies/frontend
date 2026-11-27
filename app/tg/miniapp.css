@@ -1,0 +1,21 @@
+/* Telegram theme (set by telegram-web-app.js as --tg-theme-*), falling back to the UI Kit light palette. */
+.miniapp {
+  --app-bg: var(--tg-theme-secondary-bg-color, #efeff4);
+  --app-card: var(--tg-theme-section-bg-color, #ffffff);
+  --app-header-bg: var(--tg-theme-header-bg-color, #ffffff);
+  --app-text: var(--tg-theme-text-color, #000000);
+  --app-hint: var(--tg-theme-hint-color, #8e8e93);
+  --app-subtitle: var(--tg-theme-subtitle-text-color, #8e8e93);
+  --app-accent: var(--tg-theme-accent-text-color, #007aff);
+  --app-button: var(--tg-theme-button-color, #007aff);
+  --app-button-text: var(--tg-theme-button-text-color, #ffffff);
+  --app-separator: var(--tg-theme-section-separator-color, #c8c7cc);
+  --app-highlight: color-mix(in srgb, var(--app-accent) 10%, var(--app-card));
+  --app-track: color-mix(in srgb, var(--app-hint) 30%, transparent);
+
+  min-height: 100dvh;
+  background: var(--app-bg);
+  color: var(--app-text);
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", Inter, system-ui, sans-serif;
+  -webkit-tap-highlight-color: transparent;
+}

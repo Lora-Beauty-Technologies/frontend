@@ -1,160 +1,75 @@
-import Image from "next/image";
-import Link from "next/link";
-import { Progress } from "@telegram-apps/telegram-ui/dist/components/Feedback/Progress/Progress";
-import { Typography } from "@telegram-apps/telegram-ui/dist/components/Typography/Typography";
-import {
-  type Course,
-  type LessonStatus,
-  courseHref,
-  courses,
-  formatDuration,
-  formatLessonNumber,
-  lessonHref,
-  lessonStatus,
-  progressPercent,
-  totalMinutes,
-} from "../_data/courses";
-import { AppHeader } from "./app-header";
-import { CourseNav, type CourseNavItem } from "./course-nav";
-import { Eyebrow } from "./eyebrow";
-import courseCover from "../_assets/course-cover.png";
-import checkIcon from "../_assets/icons/check.svg";
-import playIcon from "../_assets/icons/play-thumb.svg";
+import type { LessonSummary, MyCourse } from "@/lib/backend";
+import { formatDuration, formatTotalDuration, formatUnlockDate, twoDigits } from "@/lib/format";
+import { ChevronIcon, LockIcon } from "./icons";
 
-export function CourseScreen({ course }: { course: Course }) {
-  const lessonCount = course.lessons.length;
-  const percent = progressPercent(course);
+type Props = { course: MyCourse; courseNumber: number; onOpenLesson: (lesson: LessonSummary) => void };
+
+/** "My classroom": course summary, unlock progress and lessons grouped by section. */
+export function CourseScreen({ course, courseNumber, onOpenLesson }: Props) {
+  const lessons = course.sections.flatMap((s) => s.lessons);
+  const latest = lessons.find((l) => l.status === "latest");
+  const isFirstDay = course.unlockedLessons <= 1;
 
   return (
-    <>
-      <AppHeader leading={<CourseNav items={courseNavItems(course)} />} />
-      <main className="px-6 pb-8 leading-[normal]">
-        <Eyebrow className="mt-[15px] text-(--forma-accent)">Your classroom</Eyebrow>
-        <Typography Component="h1" weight="1" plain className="mt-[11px] text-[28px] leading-[normal]">
-          {course.title}
-        </Typography>
-        <p className="mt-1.5 text-[13px] text-(--forma-muted)">{course.tagline}</p>
+    <main className="flex flex-col gap-4 px-5 pt-6 pb-10">
+      <div>
+        <p className="text-[13px] font-semibold uppercase text-(--app-accent)">
+          Course {twoDigits(courseNumber)} · {course.category}
+        </p>
+        <h2 className="mt-1.5 text-[28px] font-bold leading-tight">{course.title}</h2>
+        <p className="mt-1.5 text-[15px] text-(--app-hint)">{course.tagline}</p>
+        <p className="mt-1.5 text-[13px] text-(--app-hint)">
+          {course.totalLessons} lessons · {formatTotalDuration(course.totalDurationSeconds)} · {course.level}
+        </p>
+      </div>
 
-        <div className="relative mt-[18px] h-[152px] overflow-hidden rounded-[18px]">
-          <Image
-            src={courseCover}
-            alt=""
-            fill
-            preload
-            loading="eager"
-            sizes="(max-width: 480px) 100vw, 432px"
-            className="object-cover"
-          />
-          <span className="absolute top-3 left-3.5 rounded-[7px] bg-(--forma-card) px-[9px] py-[7px] text-[10px] font-semibold">
-            {lessonCount} lessons • {totalMinutes(course)} min
-          </span>
+      <section className="rounded-2xl bg-(--app-card) p-4">
+        <h3 className="text-[17px] font-semibold">{isFirstDay ? "Start something great" : "Keep your momentum"}</h3>
+        <p className="mt-0.5 text-[15px] text-(--app-hint)">
+          {course.unlockedLessons} of {course.totalLessons} lessons unlocked
+        </p>
+        <div className="mt-2.5 h-1 rounded-full bg-(--app-track)">
+          <div className="h-1 rounded-full bg-(--app-button)" style={{ width: `${(course.unlockedLessons / course.totalLessons) * 100}%` }} />
         </div>
+        {latest ? (
+          <button onClick={() => onOpenLesson(latest)}
+            className="mt-4 h-[50px] w-full rounded-xl bg-(--app-button) text-[17px] font-semibold text-(--app-button-text)">
+            {isFirstDay ? "Start" : "Watch"} lesson {latest.position}
+          </button>
+        ) : null}
+      </section>
 
-        <div className="mt-[18px] flex justify-between text-[12px]">
-          <span className="font-medium text-(--forma-muted)">
-            {course.completedLessons > 0
-              ? `${course.completedLessons} of ${lessonCount} lessons complete`
-              : "Ready for your first lesson?"}
-          </span>
-          <span className="font-semibold text-(--forma-accent)">{percent}%</span>
-        </div>
-        <Progress value={percent} aria-label="Course progress" className="forma-progress mt-[10px]" />
-
-        <div className="mt-[26px] flex items-baseline justify-between">
-          <Typography Component="h2" weight="2" plain className="text-[19px] leading-[normal]">
-            Course lessons
-          </Typography>
-          <span className="text-[12px] text-(--forma-muted)">{lessonCount} videos</span>
-        </div>
-
-        <ol className="mt-[18px] flex flex-col gap-3">
-          {course.lessons.map((lesson, index) => {
-            const lessonNumber = index + 1;
-            return (
-              <li key={lesson.title}>
-                <LessonCard
-                  href={lessonHref(course, lessonNumber)}
-                  lessonNumber={lessonNumber}
-                  title={lesson.title}
-                  duration={formatDuration(lesson.durationSeconds)}
-                  status={lessonStatus(course, lessonNumber)}
-                />
-              </li>
-            );
-          })}
-        </ol>
-      </main>
-    </>
+      {course.sections.map((section) => (
+        <section key={section.position} className="overflow-hidden rounded-2xl bg-(--app-card)">
+          <h3 className="px-4 pt-4 pb-2 text-[17px] font-semibold">{twoDigits(section.position)} · {section.title}</h3>
+          <ol>
+            {section.lessons.map((lesson) => (
+              <li key={lesson.id}><LessonCell lesson={lesson} onOpen={() => onOpenLesson(lesson)} /></li>
+            ))}
+          </ol>
+        </section>
+      ))}
+    </main>
   );
 }
 
-function courseNavItems(currentCourse: Course): CourseNavItem[] {
-  return courses.map((course) => {
-    const hasStarted = course.completedLessons > 0;
-    return {
-      href: courseHref(course),
-      title: course.title,
-      summary: hasStarted
-        ? `${course.completedLessons} of ${course.lessons.length} lessons complete`
-        : `${course.lessons.length} lessons · ${totalMinutes(course)} min`,
-      callToAction: hasStarted ? "Continue learning" : "Start learning",
-      isCurrent: course.slug === currentCourse.slug,
-    };
-  });
-}
-
-const STATUS_STYLES: Record<LessonStatus, { label: string; labelColor: string; card: string }> = {
-  completed: {
-    label: "Completed",
-    labelColor: "text-(--forma-success)",
-    card: "bg-(--forma-card) border-transparent",
-  },
-  "up-next": {
-    label: "Up next",
-    labelColor: "text-(--forma-accent)",
-    card: "bg-(--forma-accent-soft) border-(--forma-accent-border)",
-  },
-  locked: {
-    label: "Lesson",
-    labelColor: "text-(--forma-muted)",
-    card: "bg-(--forma-card) border-transparent",
-  },
-};
-
-type LessonCardProps = {
-  href: string;
-  lessonNumber: number;
-  title: string;
-  duration: string;
-  status: LessonStatus;
-};
-
-function LessonCard({ href, lessonNumber, title, duration, status }: LessonCardProps) {
-  const styles = STATUS_STYLES[status];
-  const isCompleted = status === "completed";
-
+function LessonCell({ lesson, onOpen }: { lesson: LessonSummary; onOpen: () => void }) {
+  const isLocked = lesson.status === "locked";
+  const isLatest = lesson.status === "latest";
+  const subtitle = isLocked ? `Unlocks ${formatUnlockDate(lesson.unlocksAt!)}` : isLatest ? "Up next" : "Video lesson";
   return (
-    <Link
-      href={href}
-      className={`flex h-[84px] items-center gap-3.5 rounded-[14px] border px-[9px] ${styles.card}`}
-    >
-      <span className="relative h-16 w-[76px] shrink-0 overflow-hidden rounded-[9px]">
-        <Image src={courseCover} alt="" fill sizes="76px" className="object-cover" />
-        <span
-          className={`absolute top-1/2 left-1/2 flex size-7 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full ${
-            isCompleted ? "bg-(--forma-success)" : "bg-(--forma-accent)"
-          }`}
-        >
-          <Image src={isCompleted ? checkIcon : playIcon} alt="" />
-        </span>
+    <button onClick={onOpen} disabled={isLocked}
+      className={`flex w-full items-center gap-4 pl-4 text-left ${isLatest ? "bg-(--app-highlight)" : ""} ${isLocked ? "opacity-50" : ""}`}>
+      <span className={`w-6 text-[15px] font-semibold ${isLatest ? "text-(--app-accent)" : "text-(--app-hint)"}`}>
+        {isLocked ? <LockIcon /> : twoDigits(lesson.position)}
       </span>
-      <span className="flex flex-col">
-        <span className={`text-[9px] font-bold whitespace-pre uppercase ${styles.labelColor}`}>
-          {`${formatLessonNumber(lessonNumber)}  ${styles.label}`}
+      <span className="flex flex-1 items-center border-t border-(--app-separator)/50 py-2.5 pr-4">
+        <span className="flex-1">
+          <span className="block text-[17px]">{lesson.title}</span>
+          <span className="block text-[15px] text-(--app-hint)">{formatDuration(lesson.durationSeconds)} · {subtitle}</span>
         </span>
-        <span className="mt-1.5 text-[13px] font-semibold">{title}</span>
-        <span className="mt-2 text-[11px] text-(--forma-muted)">{duration} min</span>
+        {isLocked ? null : <span className="text-(--app-accent)"><ChevronIcon /></span>}
       </span>
-    </Link>
+    </button>
   );
 }
