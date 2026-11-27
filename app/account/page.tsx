@@ -52,7 +52,7 @@ export default async function AccountPage() {
           <section className="rounded-2xl border bg-white p-6">
             <h2 className="font-semibold">Смотрите на телефоне</h2>
             <p className="mt-1 mb-4 text-sm text-gray-600">
-              Откройте свои курсы в нашем приложении в Telegram. При первом нажатии ваш аккаунт Telegram будет привязан.
+              Откроется чат с нашим ботом: нажмите «Запустить», и ваш аккаунт будет привязан. В этом чате мы будем сообщать о новых уроках.
             </p>
             <WatchInTelegramButton />
           </section>
