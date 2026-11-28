@@ -19,31 +19,43 @@ export function useMiniAppSession() {
   const [state, setState] = useState<MiniAppState>({ kind: "loading" });
 
   useEffect(() => {
-    (async () => {
-      try {
-        const webApp = await loadTelegramWebApp();
-        webApp.ready();
-        webApp.expand();
-        if (!webApp.initData) {
-          setState({ kind: "outside-telegram" });
-          return;
-        }
-        const startParam = webApp.initDataUnsafe.start_param;
-        const linkToken = startParam?.startsWith("link_") ? startParam : undefined;
-        const session = await signIn(webApp.initData, linkToken);
-        const courses = await fetchMyCourses(session.accessToken);
-        setState({ kind: "ready", webApp, session, courses });
-      } catch (e) {
-        if (e instanceof ApiError && e.code === "not_linked") setState({ kind: "not-linked" });
-        else setState({ kind: "error", message: (e as Error).message });
-      }
-    })();
+    let isMounted = true;
+    startMiniApp().then((next) => {
+      if (isMounted) setState(next);
+    });
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   const accessToken = state.kind === "ready" ? state.session.accessToken : null;
   const getAccessToken = useCallback(async () => accessToken, [accessToken]);
 
   return { state, getAccessToken };
+}
+
+/** One sign-in per page load, even if the component mounts twice: parallel requests would invalidate each other. */
+let startup: Promise<MiniAppState> | null = null;
+
+function startMiniApp(): Promise<MiniAppState> {
+  startup ??= (async (): Promise<MiniAppState> => {
+    try {
+      const webApp = await loadTelegramWebApp();
+      webApp.ready();
+      webApp.expand();
+      if (!webApp.initData) return { kind: "outside-telegram" };
+      const startParam = webApp.initDataUnsafe.start_param;
+      const linkToken = startParam?.startsWith("link_") ? startParam : undefined;
+      const session = await signIn(webApp.initData, linkToken);
+      const courses = await fetchMyCourses(session.accessToken);
+      return { kind: "ready", webApp, session, courses };
+    } catch (e) {
+      startup = null; // allow a retry on the next mount
+      if (e instanceof ApiError && e.code === "not_linked") return { kind: "not-linked" };
+      return { kind: "error", message: (e as Error).message };
+    }
+  })();
+  return startup;
 }
 
 async function signIn(initData: string, linkToken?: string): Promise<Session> {
